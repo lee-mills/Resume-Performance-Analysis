@@ -112,7 +112,7 @@
       border-radius:10px;
     }
 
-    /* System Core popup */
+    /* System Core Logic popup */
     dialog#scModal{
       border:none;
       padding:0;
@@ -174,19 +174,19 @@
       <span class="sr-only">Diagnostic Framework</span>
     </button>
 
-    <!-- SYSTEM CORE (popup) -->
+    <!-- SYSTEM CORE LOGIC (popup) -->
     <button class="hotspot"
             id="btnSystemCore"
             type="button"
             aria-haspopup="dialog"
-            aria-label="System Core"
+            aria-label="System Core Logic"
             style="
               left: 59.7802%;
               top: 31.5430%;
               width: 19.1209%;
               height: 3.2715%;
             ">
-      <span class="sr-only">System Core</span>
+      <span class="sr-only">System Core Logic</span>
     </button>
 
     <!-- VIEW SAMPLE REPORT (OPEN PDF IN NEW TAB) -->
@@ -241,8 +241,8 @@
     </div>
   </dialog>
 
-  <!-- System Core modal -->
-  <dialog id="scModal" aria-label="System Core">
+  <!-- System Core Logic modal -->
+  <dialog id="scModal" aria-label="System Core Logic">
     <div class="scModalInner">
       <button class="scModalClose" type="button" id="scCloseBtn">Close</button>
       <div class="scCopy">
@@ -266,7 +266,7 @@
 
     dfCloseBtn.addEventListener("click", () => dfModal.close());
 
-    // SYSTEM CORE popup
+    // SYSTEM CORE LOGIC popup
     const scBtn = document.getElementById("btnSystemCore");
     const scModal = document.getElementById("scModal");
     const scCloseBtn = document.getElementById("scCloseBtn");
