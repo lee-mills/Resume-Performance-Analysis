@@ -71,8 +71,8 @@
       border:0;
     }
 
-    /* Diagnostic Framework popup */
-    dialog#dfModal{
+    /* Scan Criteria popup */
+    dialog#scModal{
       border:none;
       padding:0;
       border-radius:12px;
@@ -80,17 +80,17 @@
       box-shadow:0 20px 60px rgba(0,0,0,0.45);
     }
 
-    dialog#dfModal::backdrop{
+    dialog#scModal::backdrop{
       background:rgba(0,0,0,0.55);
     }
 
-    .dfModalInner{
+    .scModalInner{
       position:relative;
       background:#ffffff;
       padding:16px;
     }
 
-    .dfModalClose{
+    .scModalClose{
       position:absolute;
       top:10px;
       right:10px;
@@ -106,7 +106,7 @@
       z-index:2;
     }
 
-    .dfTextBox{
+    .scTextBox{
       margin-top:44px;
       height:300px;
       overflow-y:scroll;
@@ -114,7 +114,7 @@
       box-sizing:border-box;
     }
 
-    .dfImg{
+    .scImg{
       width:100%;
       height:auto;
       display:block;
@@ -137,45 +137,7 @@
       line-height:1;
       z-index:2;
     }
-
-    /* System Core Logic popup */
-    dialog#scModal{
-      border:none;
-      padding:0;
-      border-radius:12px;
-      width:min(600px, 86vw);
-      box-shadow:0 20px 60px rgba(0,0,0,0.45);
-    }
-
-    dialog#scModal::backdrop{
-      background:rgba(0,0,0,0.55);
-    }
-
-    .scModalInner{
-      position:relative;
-      background:#ffffff;
-      padding:24px;
-    }
-
-    .scTextBox{
-      margin-top:44px;
-      height:440px;
-      overflow-y:scroll;
-      padding-right:12px;
-      box-sizing:border-box;
-    }
-
-    .scCopy{
-      color:#111;
-      font-family:Arial, sans-serif;
-      font-size:18px;
-      line-height:1.4;
-    }
-
-    .scCopy p{
-      margin:0;
-    }
-
+    
     /* Privacy Note popup */
     dialog#pnModal{
       border:none;
@@ -224,37 +186,22 @@
 <body>
   <div class="stage" role="img" aria-label="Resume Performance Diagnostic page design">
 
-    <!-- DIAGNOSTIC FRAMEWORK (popup) -->
+    <!-- SCAN CRITERIA (popup) -->
     <button class="hotspot"
-            id="btnDiagnosticFramework"
+            id="btnScanCriteria"
             type="button"
             aria-haspopup="dialog"
-            aria-label="Diagnostic Framework"
+            aria-label="Scan Criteria"
             style="
-              left: 7.09%;
-              top: 17.45%;
-              width: 28.24%;
-              height: 2.15%;
-"
+              left: 10.1587%;
+              top: 18.1641%;
+              width: 19.6825%;
+              height: 1.9043%;
             ">
-      <span class="sr-only">Diagnostic Framework</span>
+      <span class="sr-only">Scan Criteria</span>
     </button>
 
-    <!-- SYSTEM CORE LOGIC (popup) -->
-    <button class="hotspot"
-            id="btnSystemCore"
-            type="button"
-            aria-haspopup="dialog"
-            aria-label="System Core Logic"
-            style="
-              left: 59.7802%;
-              top: 21.8342%;
-              width: 19.1209%;
-              height: 2.2645%;
-            ">
-      <span class="sr-only">System Core Logic</span>
-    </button>
-
+  
     <!-- PRIVACY NOTE (popup) -->
     <button class="hotspot"
             id="btnPrivacyNote"
@@ -313,26 +260,12 @@
     </a>
   </div>
 
-  <!-- Diagnostic Framework modal -->
-  <dialog id="dfModal" aria-label="Diagnostic Framework">
-    <div class="dfModalInner">
-      <button class="dfModalClose" type="button" id="dfCloseBtn">Close</button>
-      <div class="dfTextBox">
-        <img class="dfImg" src="DIAGNOSTIC%20FRAMEWORK.png" alt="ATS and Recruiter Review Criteria" />
-      </div>
-    </div>
-  </dialog>
-
-  <!-- System Core Logic modal -->
-  <dialog id="scModal" aria-label="System Core Logic">
+  <!-- Scan Criteria modal -->
+  <dialog id="scModal" aria-label="Scan Criteria">
     <div class="scModalInner">
-      <button class="modalClose" type="button" id="scCloseBtn">Close</button>
+      <button class="scModalClose" type="button" id="scCloseBtn">Close</button>
       <div class="scTextBox">
-        <div class="scCopy">
-          <p><strong>SYSTEM CORE LOGIC:</strong><br><span style="display:block;height:0.5em;"></span>
-            Advanced AI functions as the heuristic analysis layer within the diagnostic pipeline. Before deterministic scoring and report generation occur, the system submits extracted resume text together with the target job title and any job description for guided evaluation under a defined prompt-based rule set. Advanced AI then performs a qualitative assessment using semantic matching, contextual interpretation, evidence found in the resume text, and the prompt’s instructed judgment rules to determine alignment with each required criterion. That assessment is returned as structured JSON, which the script then validates and uses downstream for deterministic scoring, field population, and report generation.
-          </p>
-        </div>
+        <img class="scImg" src="DIAGNOSTIC%20FRAMEWORK.png" alt="ATS and Recruiter Review Criteria" />
       </div>
     </div>
   </dialog>
@@ -352,20 +285,8 @@
   </dialog>
 
   <script>
-    // DIAGNOSTIC FRAMEWORK popup
-    const dfBtn = document.getElementById("btnDiagnosticFramework");
-    const dfModal = document.getElementById("dfModal");
-    const dfCloseBtn = document.getElementById("dfCloseBtn");
-
-    dfBtn.addEventListener("click", () => {
-      if (typeof dfModal.showModal === "function") dfModal.showModal();
-      else alert("Your browser does not support <dialog>. Use a modern browser.");
-    });
-
-    dfCloseBtn.addEventListener("click", () => dfModal.close());
-
-    // SYSTEM CORE LOGIC popup
-    const scBtn = document.getElementById("btnSystemCore");
+    // SCAN CRITERIA popup
+    const scBtn = document.getElementById("btnScanCriteria");
     const scModal = document.getElementById("scModal");
     const scCloseBtn = document.getElementById("scCloseBtn");
 
