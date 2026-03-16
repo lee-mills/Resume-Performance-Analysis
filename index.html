@@ -260,22 +260,29 @@
     </a>
 
 
-    <!-- VISITOR COUNTER -->
-    <div id="visitorCounter"
-         style="
-           position:absolute;
-           left: 89.2%;
-           top: 98.0%;
-           width: 16%;
-           height: 1.2%;
-           font-family:Arial,sans-serif;
-           font-size:16px;
-           font-weight:600;
-           color:#bfc2cb;
-           text-align:left;
-           line-height:1.2;
-         ">
-      Visits: loading...
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("nocount") === "1") {
+      localStorage.setItem("skipVisitorCount", "1");
+    }
+
+    if (params.get("countme") === "1") {
+      localStorage.removeItem("skipVisitorCount");
+    }
+
+    const counterUrl =
+      localStorage.getItem("skipVisitorCount") === "1"
+        ? "https://site-counter-502041884836.us-south1.run.app?viewonly=1"
+        : "https://site-counter-502041884836.us-south1.run.app";
+
+    fetch(counterUrl)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("visitorCounter").textContent = "Visits: " + data.count;
+      })
+      .catch(() => {
+        document.getElementById("visitorCounter").textContent = "Visits: unavailable";
+      });
     </div>    
   </div>
 
