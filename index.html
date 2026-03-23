@@ -137,7 +137,7 @@
       line-height:1;
       z-index:2;
     }
-    
+
     /* Privacy Note popup */
     dialog#pnModal{
       border:none;
@@ -201,7 +201,6 @@
       <span class="sr-only">Scan Criteria</span>
     </button>
 
-  
     <!-- PRIVACY NOTE (popup) -->
     <button class="hotspot"
             id="btnPrivacyNote"
@@ -277,10 +276,9 @@
            line-height:1.2;
          ">
       loading...
-    </div>    
+    </div>
   </div>
 
-  
   <!-- Scan Criteria modal -->
   <dialog id="scModal" aria-label="Scan Criteria">
     <div class="scModalInner">
@@ -323,7 +321,8 @@
       trackingAllowed: localStorage.getItem("skipVisitorCount") !== "1",
       visitId: "",
       startedAtMs: Date.now(),
-      buttonClicks: []
+      buttonClicks: [],
+      heartbeatId: null
     };
 
     function getElapsedSeconds() {
@@ -357,6 +356,16 @@
         body,
         keepalive: true
       }).catch(() => {});
+    }
+
+    function startHeartbeat() {
+      if (!trackingState.trackingAllowed || !trackingState.visitId || trackingState.heartbeatId) {
+        return;
+      }
+
+      trackingState.heartbeatId = setInterval(() => {
+        sendTrackingUpdate(false);
+      }, 5000);
     }
 
     function recordButtonClick(buttonId, buttonLabel, useBeacon = false) {
@@ -417,8 +426,22 @@
 
     // SUBMIT RESUME
     const submitResumeBtn = document.getElementById("btnSubmitResume");
-    submitResumeBtn.addEventListener("click", () => {
-      recordButtonClick("btnSubmitResume", "Submit Resume", true);
+    submitResumeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      const submitUrl = submitResumeBtn.href;
+      const submitWindow = window.open("", "_blank");
+
+      recordButtonClick("btnSubmitResume", "Submit Resume", false);
+
+      setTimeout(() => {
+        if (submitWindow && !submitWindow.closed) {
+          submitWindow.opener = null;
+          submitWindow.location = submitUrl;
+        } else {
+          window.location.href = submitUrl;
+        }
+      }, 250);
     });
 
     // CONTACT EMAIL
@@ -448,7 +471,7 @@
 
         if (trackingState.trackingAllowed && data.visit_id) {
           trackingState.visitId = data.visit_id;
-          sendTrackingUpdate(false);
+          startHeartbeat();
         }
       })
       .catch(() => {
