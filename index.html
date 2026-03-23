@@ -233,6 +233,7 @@
 
     <!-- SUBMIT RESUME -->
     <a class="hotspot"
+       id="btnSubmitResume"
        href="https://forms.gle/hCWXAvYTgk5oA7MY9"
        target="_blank"
        rel="noopener"
@@ -248,6 +249,7 @@
 
     <!-- CONTACT EMAIL -->
     <a class="hotspot"
+       id="btnContactEmail"
        href="mailto:leemills.resume@gmail.com"
        aria-label="Contact email"
        style="
@@ -258,7 +260,6 @@
        ">
       <span class="sr-only">Contact email</span>
     </a>
-
 
     <!-- VISITOR COUNTER -->
     <div id="visitorCounter"
@@ -305,35 +306,8 @@
   </dialog>
 
   <script>
-    // SCAN CRITERIA popup
-    const scBtn = document.getElementById("btnScanCriteria");
-    const scModal = document.getElementById("scModal");
-    const scCloseBtn = document.getElementById("scCloseBtn");
-
-    scBtn.addEventListener("click", () => {
-      if (typeof scModal.showModal === "function") scModal.showModal();
-      else alert("Your browser does not support <dialog>. Use a modern browser.");
-    });
-
-    scCloseBtn.addEventListener("click", () => scModal.close());
-
-    // PRIVACY NOTE popup
-    const pnBtn = document.getElementById("btnPrivacyNote");
-    const pnModal = document.getElementById("pnModal");
-    const pnCloseBtn = document.getElementById("pnCloseBtn");
-
-    pnBtn.addEventListener("click", () => {
-      if (typeof pnModal.showModal === "function") pnModal.showModal();
-      else alert("Your browser does not support <dialog>. Use a modern browser.");
-    });
-
-    pnCloseBtn.addEventListener("click", () => pnModal.close());
-
-    // VIEW SAMPLE REPORT
-    const sampleBtn = document.getElementById("btnSampleReport");
-    sampleBtn.addEventListener("click", () => {
-      window.open("Sample%20Report.pdf", "_blank", "noopener");
-    });
+    const counterBaseUrl = "https://site-counter-502041884836.us-south1.run.app";
+    const visitorCounter = document.getElementById("visitorCounter");
 
     const params = new URLSearchParams(window.location.search);
 
@@ -345,18 +319,140 @@
       localStorage.removeItem("skipVisitorCount");
     }
 
-    const counterUrl =
-      localStorage.getItem("skipVisitorCount") === "1"
-        ? "https://site-counter-502041884836.us-south1.run.app?viewonly=1"
-        : "https://site-counter-502041884836.us-south1.run.app";
+    const trackingState = {
+      trackingAllowed: localStorage.getItem("skipVisitorCount") !== "1",
+      visitId: "",
+      startedAtMs: Date.now(),
+      buttonClicks: []
+    };
+
+    function getElapsedSeconds() {
+      return Math.max(0, Math.round((Date.now() - trackingState.startedAtMs) / 1000));
+    }
+
+    function sendTrackingUpdate(useBeacon = false) {
+      if (!trackingState.trackingAllowed || !trackingState.visitId) {
+        return;
+      }
+
+      const payload = {
+        visit_id: trackingState.visitId,
+        duration_seconds: getElapsedSeconds(),
+        button_clicks: trackingState.buttonClicks
+      };
+
+      const body = JSON.stringify(payload);
+
+      if (useBeacon && navigator.sendBeacon) {
+        const blob = new Blob([body], { type: "application/json" });
+        navigator.sendBeacon(counterBaseUrl, blob);
+        return;
+      }
+
+      fetch(counterBaseUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body,
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    function recordButtonClick(buttonId, buttonLabel, useBeacon = false) {
+      if (!trackingState.trackingAllowed) {
+        return;
+      }
+
+      trackingState.buttonClicks.push({
+        button_id: buttonId,
+        button_label: buttonLabel,
+        clicked_at: new Date().toISOString(),
+        seconds_on_page: getElapsedSeconds()
+      });
+
+      sendTrackingUpdate(useBeacon);
+    }
+
+    // SCAN CRITERIA popup
+    const scBtn = document.getElementById("btnScanCriteria");
+    const scModal = document.getElementById("scModal");
+    const scCloseBtn = document.getElementById("scCloseBtn");
+
+    scBtn.addEventListener("click", () => {
+      recordButtonClick("btnScanCriteria", "Scan Criteria");
+
+      if (typeof scModal.showModal === "function") {
+        scModal.showModal();
+      } else {
+        alert("Your browser does not support <dialog>. Use a modern browser.");
+      }
+    });
+
+    scCloseBtn.addEventListener("click", () => scModal.close());
+
+    // PRIVACY NOTE popup
+    const pnBtn = document.getElementById("btnPrivacyNote");
+    const pnModal = document.getElementById("pnModal");
+    const pnCloseBtn = document.getElementById("pnCloseBtn");
+
+    pnBtn.addEventListener("click", () => {
+      recordButtonClick("btnPrivacyNote", "Privacy Note");
+
+      if (typeof pnModal.showModal === "function") {
+        pnModal.showModal();
+      } else {
+        alert("Your browser does not support <dialog>. Use a modern browser.");
+      }
+    });
+
+    pnCloseBtn.addEventListener("click", () => pnModal.close());
+
+    // VIEW SAMPLE REPORT
+    const sampleBtn = document.getElementById("btnSampleReport");
+    sampleBtn.addEventListener("click", () => {
+      recordButtonClick("btnSampleReport", "View Sample Report");
+      window.open("Sample%20Report.pdf", "_blank", "noopener");
+    });
+
+    // SUBMIT RESUME
+    const submitResumeBtn = document.getElementById("btnSubmitResume");
+    submitResumeBtn.addEventListener("click", () => {
+      recordButtonClick("btnSubmitResume", "Submit Resume", true);
+    });
+
+    // CONTACT EMAIL
+    const contactEmailBtn = document.getElementById("btnContactEmail");
+    contactEmailBtn.addEventListener("click", () => {
+      recordButtonClick("btnContactEmail", "Contact email", true);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        sendTrackingUpdate(true);
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      sendTrackingUpdate(true);
+    });
+
+    const counterUrl = trackingState.trackingAllowed
+      ? counterBaseUrl
+      : `${counterBaseUrl}?viewonly=1`;
 
     fetch(counterUrl)
       .then(response => response.json())
       .then(data => {
-        document.getElementById("visitorCounter").textContent = data.count;
+        visitorCounter.textContent = data.count;
+
+        if (trackingState.trackingAllowed && data.visit_id) {
+          trackingState.visitId = data.visit_id;
+          sendTrackingUpdate(false);
+        }
       })
       .catch(() => {
-        document.getElementById("visitorCounter").textContent = "unavailable";
+        visitorCounter.textContent = "unavailable";
       });
   </script>
 </body>
